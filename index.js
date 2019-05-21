@@ -35,8 +35,10 @@ function authorize(credentials, callback, param1) {
     fs.readFile(TOKEN_PATH, (err, token) => {
       if (err) return getNewToken(oAuth2Client, callback, param1);
       var tokenObj = JSON.parse(token);
+      /*
       tokenObj.access_token = process.env.ACCESS_TOKEN;
       tokenObj.refresh_token = process.env.REFRESH_TOKEN;
+      */
       oAuth2Client.setCredentials(tokenObj);
       if (param1 != null) {
         callback(oAuth2Client, param1);
@@ -69,9 +71,6 @@ function authorize(credentials, callback, param1) {
         if (err) return console.error('Error while trying to retrieve access token', err);
         oAuth2Client.setCredentials(token);
         // Store relevant token info to env for later function executions
-        process.env.ACCESS_TOKEN = token.access_token;
-        token.access_token = "";
-        token.refresh_token = "";
         fs.writeFile(TOKEN_PATH, JSON.stringify(token), (err) => {
           if (err) console.error(err);
           console.log('Token stored to', TOKEN_PATH);
@@ -91,62 +90,11 @@ function authorize(credentials, callback, param1) {
       if (err) return console.log('Error loading client secret file:', err);
       // Authorize a client with credentials, then call the Google Sheets API.
       var contentObj = JSON.parse(content);
-      contentObj.installed.client_secret = process.env.CLIENT_SECRET;
+      //contentObj.installed.client_secret = process.env.CLIENT_SECRET;
       authorize(contentObj, func, param1);
     });
   }
 
-  /////////////////////////////////////////////////LOOK PRETTY/////////////////////////////////////////////////////
-  function genBatUpReqBody(requests) {
-    return {
-      spreadsheetId: '18d4wyRXZPrCh0YHy-yAl5zsn-XrS29E0QxcPrLVnXEk',
-      resource: {
-        requests: requests,
-        includeSpreadsheetInResponse: false
-      }
-    };
-  }
-
-  /* values is an array of string or int to be pushed in.
-  */
-  function genUpdateCellsReq(values, sheetId, rowIndex, columnIndex) {
-    var vals = [];
-    for (let i = 0; i < values.length; i++) {
-      if (!(typeof values[i] == 'number')) {
-        vals.push(
-            {
-              userEnteredValue: {
-                stringValue: values[i]
-              }
-            }
-        );
-      }
-      else {
-        vals.push(
-          {
-            userEnteredValue: {
-              numberValue: values[i]
-            }
-          }
-        );
-      }
-    }
-    return {
-      updateCells: {
-        rows: [
-          {
-            values: vals
-          }
-        ],
-        fields: "userEnteredValue",
-        start: {
-          sheetId: sheetId,
-          rowIndex: rowIndex,
-          columnIndex: columnIndex
-        }
-      }
-    };
-  }
 
 
   client.on('error', console.error);
@@ -207,4 +155,4 @@ function authorize(credentials, callback, param1) {
     }
   });
 
-  client.login(process.env.TOKEN);
+  client.login(config.token);
