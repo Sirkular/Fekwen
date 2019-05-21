@@ -1,0 +1,11 @@
+{
+  "name": "fekwen-bot",
+  "version": "1.0.0",
+  "description": "na",
+  "main": "index.js",
+  "author": "Justin",
+  "dependencies": {
+    "discord.io": "^2.5.3",
+    "googleapis": "^39.2.0"
+  }
+}
